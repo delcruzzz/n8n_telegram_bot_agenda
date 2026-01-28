@@ -1,0 +1,170 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "tg_trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [100, 400]
+    },
+    {
+      "parameters": {
+        "operation": "lookup",
+        "documentId": {
+          "__rl": true,
+          "value": "11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U",
+          "mode": "id"
+        },
+        "sheetName": "SESSIONS",
+        "lookupColumn": "telegram_user",
+        "lookupValue": "={{ $json.message.from.id.toString() }}",
+        "options": {}
+      },
+      "id": "gs_lookup",
+      "name": "Consultar Sesión",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [320, 400]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": false },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "operator": "regex",
+                    "rightValue": "/start|menu/i"
+                  },
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "operator": "equal",
+                    "rightValue": "9"
+                  }
+                ],
+                "combinator": "or"
+              },
+              "renameLabel": "Ir al Inicio"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": false },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $node[\"Consultar Sesión\"].json[\"pantalla_actual\"] }}",
+                    "operator": "equal",
+                    "rightValue": "MENU_PRINCIPAL"
+                  },
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "operator": "equal",
+                    "rightValue": "1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameLabel": "Seleccionó Agenda"
+            }
+          ]
+        },
+        "fallbackOutput": 2
+      },
+      "id": "main_router",
+      "name": "Router Principal",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [560, 400]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"tg_trigger\"].json[\"message\"][\"chat\"][\"id\"] }}",
+        "text": "=Hola, soy AgendaBot 👋\n\nEstoy aquí para ayudarte a organizar tus citas, tareas y recordatorios de forma sencilla.\n\nMenú principal:\n0. Ayuda\n1. Agenda (citas)\n2. Tareas\n3. Recordatorios\n4. Hábitos\n5. Listas\n6. Reportes\n7. Configuración\n8. Administrador\n\nTip rápido: escribe solo el número (por ejemplo: 1).",
+        "additionalFields": {}
+      },
+      "id": "msg_bienvenida",
+      "name": "Mensaje Bienvenida",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [820, 240]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"tg_trigger\"].json[\"message\"][\"chat\"][\"id\"] }}",
+        "text": "=Perfecto, vamos con tu agenda.\n\n¿Qué deseas hacer?\n\n1. Agendar una nueva cita\n2. Consultar tu agenda\n3. Reprogramar una cita\n4. Cancelar una cita\n5. Marcar una cita como completada\n9. Volver al menú principal",
+        "additionalFields": {}
+      },
+      "id": "msg_agenda",
+      "name": "Mensaje Agenda",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [820, 420]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U",
+          "mode": "id"
+        },
+        "sheetName": "SESSIONS",
+        "key": "telegram_user",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "pantalla_actual": "MENU_PRINCIPAL",
+            "timestamp_ultima_interaccion": "={{ $now }}"
+          }
+        }
+      },
+      "id": "update_home",
+      "name": "Update Session Home",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1050, 240]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U",
+          "mode": "id"
+        },
+        "sheetName": "SESSIONS",
+        "key": "telegram_user",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "pantalla_actual": "MENU_AGENDA",
+            "timestamp_ultima_interaccion": "={{ $now }}"
+          }
+        }
+      },
+      "id": "update_agenda",
+      "name": "Update Session Agenda",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1050, 420]
+    }
+  ],
+  "connections": {
+    "tg_trigger": { "main": [[{ "node": "gs_lookup", "type": "main", "index": 0 }]] },
+    "gs_lookup": { "main": [[{ "node": "main_router", "type": "main", "index": 0 }]] },
+    "main_router": {
+      "main": [
+        [{ "node": "msg_bienvenida", "type": "main", "index": 0 }],
+        [{ "node": "msg_agenda", "type": "main", "index": 0 }]
+      ]
+    },
+    "msg_bienvenida": { "main": [[{ "node": "update_home", "type": "main", "index": 0 }]] },
+    "msg_agenda": { "main": [[{ "node": "update_agenda", "type": "main", "index": 0 }]] }
+  }
+}

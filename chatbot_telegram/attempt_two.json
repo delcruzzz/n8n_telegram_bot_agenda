@@ -1,0 +1,1487 @@
+{
+  "name": "AgendaBot Services - Menú + Agenda (Estados en Sheets, sin Code nodes)",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "12ad02a6-6140-4566-8a58-75d0404ac45f",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        -980,
+        140
+      ],
+      "webhookId": "8adbbc74-dfbd-46b5-b8e8-f04664b5af76",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "telegram_user",
+              "value": "={{$json.message.from.id}}"
+            },
+            {
+              "name": "username",
+              "value": "={{$json.message.from.username || ''}}"
+            },
+            {
+              "name": "nombre_telegram",
+              "value": "={{($json.message.from.first_name || '') + ' ' + ($json.message.from.last_name || '')}}"
+            },
+            {
+              "name": "text",
+              "value": "={{($json.message.text || '').trim()}}"
+            },
+            {
+              "name": "chat_id",
+              "value": "={{$json.message.chat.id}}"
+            },
+            {
+              "name": "now_iso",
+              "value": "={{$now.toISO()}}"
+            },
+            {
+              "name": "today",
+              "value": "={{$now.toISODate()}}"
+            }
+          ]
+        }
+      },
+      "id": "e2bfe9c7-50a0-4df2-b92a-bfd0b67d1510",
+      "name": "Normalizar Entrada",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "getRow",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "USUARIOS",
+        "filtersUi": {
+          "values": [
+            {
+              "column": "telegram_user",
+              "value": "={{$json.telegram_user}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8ccb1350-445d-4aaa-b875-7d7495bff890",
+      "name": "Verificación Usuario",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -540,
+        140
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [],
+          "string": [
+            {
+              "value1": "={{$json.permitido || ''}}",
+              "operation": "equals",
+              "value2": "SI"
+            }
+          ]
+        }
+      },
+      "id": "ee11c1a2-6113-4b6d-81af-4bd878ebd6f3",
+      "name": "IF Usuario Permitido",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'⛔ Acceso denegado\\n\\nTu usuario no está permitido para usar AgendaBot.\\n\\nSi crees que es un error, pide al administrador habilitarte en la hoja USUARIOS.'}}",
+        "additionalFields": {}
+      },
+      "id": "1bd2e3ee-4a4a-4d3a-96c4-2f7a28f5f2e4",
+      "name": "Telegram - Denegado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        -90,
+        40
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "getRow",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "SESSIONS",
+        "filtersUi": {
+          "values": [
+            {
+              "column": "telegram_user",
+              "value": "={{$json.telegram_user}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7b9c8b32-2edb-42a2-925c-f25c0c22a8cd",
+      "name": "Buscar Sesión",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -90,
+        200
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.rowNumber || 0}}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "fe3e51b8-1844-4507-9c90-40d8a365c5ad",
+      "name": "IF Existe Sesión",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        130,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "append",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "SESSIONS",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user": "={{$json.telegram_user}}",
+            "pantalla_actual": "MENU_PRINCIPAL",
+            "paso_actual": "INICIO",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{$json.now_iso}}"
+          }
+        },
+        "options": {}
+      },
+      "id": "9b9d5ea4-252a-41b1-a035-818c9a4cffd2",
+      "name": "Crear Sesión Inicial",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        360,
+        80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "pantalla_actual",
+              "value": "={{$json.pantalla_actual || 'MENU_PRINCIPAL'}}"
+            },
+            {
+              "name": "paso_actual",
+              "value": "={{$json.paso_actual || 'INICIO'}}"
+            },
+            {
+              "name": "datos_parciales",
+              "value": "={{$json.datos_parciales || '{}'}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "session_row",
+              "value": "={{$json.rowNumber || 0}}"
+            }
+          ]
+        },
+        "includeInOutput": "={{$json}}"
+      },
+      "id": "a9b8ea65-5db3-41b8-bc33-4e4534f621e0",
+      "name": "Normalizar Sesión (Existente)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        360,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "pantalla_actual",
+              "value": "MENU_PRINCIPAL"
+            },
+            {
+              "name": "paso_actual",
+              "value": "INICIO"
+            },
+            {
+              "name": "datos_parciales",
+              "value": "{}"
+            }
+          ],
+          "number": [
+            {
+              "name": "session_row",
+              "value": 0
+            }
+          ]
+        },
+        "includeInOutput": "={{$json}}"
+      },
+      "id": "cc3e3a1c-bbc2-4b66-86dc-d88a0e2e8e4f",
+      "name": "Normalizar Sesión (Nueva)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        560,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "getRow",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "SESSIONS",
+        "filtersUi": {
+          "values": [
+            {
+              "column": "telegram_user",
+              "value": "={{$json.telegram_user}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "49a85d65-9d17-43f2-87b9-dde3c268d11d",
+      "name": "Releer Sesión (tras crear)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        760,
+        80
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "pantalla_actual",
+              "value": "={{$json.pantalla_actual || 'MENU_PRINCIPAL'}}"
+            },
+            {
+              "name": "paso_actual",
+              "value": "={{$json.paso_actual || 'INICIO'}}"
+            },
+            {
+              "name": "datos_parciales",
+              "value": "={{$json.datos_parciales || '{}'}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "session_row",
+              "value": "={{$json.rowNumber || 0}}"
+            }
+          ]
+        },
+        "includeInOutput": "={{$json}}"
+      },
+      "id": "9f75a464-1480-4b1a-b2a2-4b2a9d0e8f2b",
+      "name": "Normalizar Sesión (Releída)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        960,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$json.pantalla_actual}}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value2": "MENU_PRINCIPAL"
+            },
+            {
+              "operation": "equal",
+              "value2": "MENU_AGENDA"
+            },
+            {
+              "operation": "equal",
+              "value2": "AGENDA_PASO_FECHA"
+            },
+            {
+              "operation": "equal",
+              "value2": "AGENDA_PASO_HORA"
+            },
+            {
+              "operation": "equal",
+              "value2": "AGENDA_PASO_NOMBRE"
+            },
+            {
+              "operation": "equal",
+              "value2": "AGENDA_PASO_MOTIVO"
+            },
+            {
+              "operation": "equal",
+              "value2": "AGENDA_PASO_CANAL"
+            },
+            {
+              "operation": "equal",
+              "value2": "AGENDA_CONFIRMACION"
+            }
+          ]
+        },
+        "fallbackOutput": 8
+      },
+      "id": "f3e3c6db-63f2-40ad-9d3a-bd5bcb57d6c8",
+      "name": "Router por Pantalla",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [
+        560,
+        240
+      ]
+    },
+
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.text}}",
+              "operation": "regex",
+              "value2": "^(0|1|2|3|4|5|6|7|8)$"
+            }
+          ]
+        }
+      },
+      "id": "ee2bfb5a-9cbd-46b0-9ae6-153aa39c7cf8",
+      "name": "MP: IF Opción Válida",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        820,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$json.text}}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value2": "0"
+            },
+            {
+              "operation": "equal",
+              "value2": "1"
+            }
+          ]
+        },
+        "fallbackOutput": 2
+      },
+      "id": "cfcf20a6-4aa9-40b0-97bc-4e85813e9d54",
+      "name": "MP: Switch Opción",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'Hola, soy AgendaBot 👋\\n\\nEstoy aquí para ayudarte a organizar tus citas, tareas y recordatorios\\nde forma sencilla y sin complicaciones.\\n\\nPuedes escribirme en cualquier momento.\\nPara avanzar, solo tienes que escribir el número de la opción que quieras usar.\\n\\nMenú principal:\\n0. Ayuda\\n1. Agenda (citas)\\n2. Tareas\\n3. Recordatorios\\n4. Hábitos\\n5. Listas\\n6. Reportes\\n7. Configuración\\n8. Administrador\\n\\nTip rápido: escribe solo el número (por ejemplo: 1) y presiona enviar.'}}",
+        "additionalFields": {}
+      },
+      "id": "7a768a6e-7c1c-4fdf-b07e-2f99db46a97d",
+      "name": "MP: Enviar Ayuda",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        120
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "updateRow",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "SESSIONS",
+        "rowNumber": "={{$json.session_row}}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "pantalla_actual": "MENU_AGENDA",
+            "paso_actual": "MENU_AGENDA",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{$json.now_iso}}"
+          }
+        },
+        "options": {}
+      },
+      "id": "741dcbe7-8da2-465b-b519-7dcf3db5a3b1",
+      "name": "MP-> Agenda: Actualizar Sesión",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1260,
+        220
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'Perfecto, vamos con tu agenda.\\n\\n¿Qué deseas hacer?\\n\\n1. Agendar una nueva cita\\n2. Consultar tu agenda\\n3. Reprogramar una cita\\n4. Cancelar una cita\\n5. Marcar una cita como completada\\n9. Volver al menú principal'}}",
+        "additionalFields": {}
+      },
+      "id": "1d03c874-2b1f-410a-9e21-a3b70d6f0b99",
+      "name": "Agenda: Mostrar Menú",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        220
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'Ups, esa opción no existe en este menú.\\n\\nPor favor escribe uno de los números que ves en pantalla.\\n\\nEstás en: Menú principal\\nOpciones disponibles: 0 al 8'}}",
+        "additionalFields": {}
+      },
+      "id": "9ad7b3c8-8f8f-45b6-8b7f-9f90b7dcf946",
+      "name": "MP: Opción inválida",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        360
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'✅ Módulo aún no implementado en este workflow de prueba.\\n\\nMenú principal:\\n0. Ayuda\\n1. Agenda (citas)\\n2. Tareas\\n3. Recordatorios\\n4. Hábitos\\n5. Listas\\n6. Reportes\\n7. Configuración\\n8. Administrador\\n\\nSugerencia: si quieres empezar rápido, te recomiendo la opción 1 (Agenda).'}}",
+        "additionalFields": {}
+      },
+      "id": "f1b9a3bb-4c50-4b80-9a69-541aa97211f7",
+      "name": "MP: No implementado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        360
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.text}}",
+              "operation": "regex",
+              "value2": "^(1|2|3|4|5|9)$"
+            }
+          ]
+        }
+      },
+      "id": "b18c1dd3-0e5c-4d8f-9a45-79d1f0b9bffd",
+      "name": "Agenda: IF Opción Válida",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        820,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'Ups, esa opción no existe en este menú.\\n\\nEstás en: Menú Agenda\\nOpciones disponibles: 1,2,3,4,5,9\\n\\nPerfecto, vamos con tu agenda.\\n\\n1. Agendar una nueva cita\\n2. Consultar tu agenda\\n3. Reprogramar una cita\\n4. Cancelar una cita\\n5. Marcar una cita como completada\\n9. Volver al menú principal'}}",
+        "additionalFields": {}
+      },
+      "id": "924b0d31-4c74-4d5f-9aa6-3d32db7b7bcf",
+      "name": "Agenda: Opción inválida",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        660
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$json.text}}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value2": "1"
+            },
+            {
+              "operation": "equal",
+              "value2": "2"
+            },
+            {
+              "operation": "equal",
+              "value2": "9"
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "c47c0ca2-2c8a-4c25-b20f-02bbcedb1423",
+      "name": "Agenda: Switch Opción",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "updateRow",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "SESSIONS",
+        "rowNumber": "={{$json.session_row}}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "pantalla_actual": "AGENDA_PASO_FECHA",
+            "paso_actual": "AGENDA_PASO_FECHA",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{$json.now_iso}}"
+          }
+        },
+        "options": {}
+      },
+      "id": "d620c4ef-0fc4-4f4f-9f92-1d1d2b7d0e0f",
+      "name": "Agenda-> Paso Fecha: Actualizar Sesión",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1260,
+        480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'Empecemos a crear tu cita.\\n\\nPaso 1 de 6\\n¿Cuál es la fecha de la cita?\\n\\nFormato: YYYY-MM-DD\\nEjemplo: 2025-12-20\\n\\n9. Cancelar'}}",
+        "additionalFields": {}
+      },
+      "id": "ccfb3e2a-bd09-4c8a-a2d2-5dfc2098d89f",
+      "name": "Agenda Wizard: Preguntar Fecha",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        480
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'📌 Consulta de agenda (demo).\\n\\nEn este JSON de prueba, la consulta completa se implementa después de validar tu SpreadsheetId real.\\n\\nMientras tanto, puedes usar:\\n1. Agendar una nueva cita\\n9. Volver al menú principal'}}",
+        "additionalFields": {}
+      },
+      "id": "44fce8da-4a39-4c6f-8a4a-8b5b9b12b512",
+      "name": "Agenda: Consultar (demo)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        540
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "updateRow",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "SESSIONS",
+        "rowNumber": "={{$json.session_row}}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "pantalla_actual": "MENU_PRINCIPAL",
+            "paso_actual": "INICIO",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{$json.now_iso}}"
+          }
+        },
+        "options": {}
+      },
+      "id": "e88b5bf3-73a7-4fef-8c34-4c4f1f1d80df",
+      "name": "Agenda-> MP: Actualizar Sesión",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1260,
+        600
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'¿En qué te puedo ayudar hoy?\\n\\nMenú principal:\\n0. Ayuda\\n1. Agenda (citas)\\n2. Tareas\\n3. Recordatorios\\n4. Hábitos\\n5. Listas\\n6. Reportes\\n7. Configuración\\n8. Administrador\\n\\nSugerencia: Si quieres empezar rápido, te recomiendo la opción 1 (Agenda).'}}",
+        "additionalFields": {}
+      },
+      "id": "2f52db1a-0b1f-4dd2-a323-30f6a7c735f4",
+      "name": "MP: Mostrar Menú",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        600
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.text}}",
+              "operation": "equals",
+              "value2": "9"
+            }
+          ]
+        }
+      },
+      "id": "6c05c10a-02d6-4f57-9a4b-39b9cba8d7b9",
+      "name": "Fecha: IF Cancelar",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        820,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.text}}",
+              "operation": "regex",
+              "value2": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          ]
+        }
+      },
+      "id": "2a0ee4a1-7a5b-4b97-b07d-4f92f4b1b0a8",
+      "name": "Fecha: IF Formato OK",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.text >= $json.today}}",
+              "operation": "isTrue"
+            }
+          ]
+        }
+      },
+      "id": "4a4b6d13-1b51-493f-8b73-5d2c68f7d410",
+      "name": "Fecha: IF No Pasado",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "updateRow",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "SESSIONS",
+        "rowNumber": "={{$json.session_row}}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "pantalla_actual": "MENU_AGENDA",
+            "paso_actual": "MENU_AGENDA",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{$json.now_iso}}"
+          }
+        },
+        "options": {}
+      },
+      "id": "c9db7a2c-7a6f-49f4-84e0-8ce4c0f3c2d4",
+      "name": "Cancelar-> Volver a Agenda (Sesión)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1040,
+        780
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'Proceso cancelado 👍\\n\\nPerfecto, vamos con tu agenda.\\n\\n1. Agendar una nueva cita\\n2. Consultar tu agenda\\n3. Reprogramar una cita\\n4. Cancelar una cita\\n5. Marcar una cita como completada\\n9. Volver al menú principal'}}",
+        "additionalFields": {}
+      },
+      "id": "3a2a7cbb-8e08-4b4e-9f8d-ef2b17c7b5a3",
+      "name": "Cancelar-> Mostrar Menú Agenda",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        780
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'Ups, esa fecha no tiene el formato correcto.\\n\\nUsa: YYYY-MM-DD\\nEjemplo: 2025-12-20\\n\\n9. Cancelar'}}",
+        "additionalFields": {}
+      },
+      "id": "b6fa71c4-55cb-4d3d-9f10-fb29a0e5a3b6",
+      "name": "Fecha: Formato inválido",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        1040
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'No puedo agendar en el pasado.\\n\\nIngresa una fecha igual o posterior a hoy (' + $json.today + ').\\n\\nFormato: YYYY-MM-DD\\n9. Cancelar'}}",
+        "additionalFields": {}
+      },
+      "id": "6b06c7a4-1f2f-4d9d-9e5d-9ff7ff3f2fbb",
+      "name": "Fecha: Está en el pasado",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        1040
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "updateRow",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "SESSIONS",
+        "rowNumber": "={{$json.session_row}}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "pantalla_actual": "AGENDA_PASO_HORA",
+            "paso_actual": "AGENDA_PASO_HORA",
+            "datos_parciales": "={{JSON.stringify({fecha: $json.text})}}",
+            "timestamp_ultima_interaccion": "={{$json.now_iso}}"
+          }
+        },
+        "options": {}
+      },
+      "id": "cbb0639a-4a7b-4b62-bac7-7c9a4a3d0f36",
+      "name": "Fecha OK -> Guardar y pedir Hora (Sesión)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1480,
+        920
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "sendMessage",
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{'Paso 2 de 6\\n¿A qué hora será la cita?\\n\\nFormato 24 horas (HH:MM)\\nEjemplo: 14:30\\n\\n9. Cancelar'}}",
+        "additionalFields": {}
+      },
+      "id": "33f2fb69-8e3e-4f84-9c08-6e0a7e2f9f7f",
+      "name": "Agenda Wizard: Preguntar Hora",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        920
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "append",
+        "documentId": "={{$env.AGENDA_SHEET_ID}}",
+        "sheetName": "LOGS",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{$json.now_iso}}",
+            "telegram_user": "={{$json.telegram_user}}",
+            "pantalla": "={{$json.pantalla_actual}}",
+            "opcion_elegida": "={{$json.text}}",
+            "resultado": "OK"
+          }
+        },
+        "options": {}
+      },
+      "id": "8f3f8b25-b0c6-4c4e-9c6b-5f1a4e6f7d11",
+      "name": "LOG (simple)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1860,
+        140
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "content": "IMPORTANTE:\n- Define $env.AGENDA_SHEET_ID con el spreadsheetId real de AgendaBot_DB.\n- Este JSON implementa:\n  * Menú principal\n  * Menú Agenda\n  * Wizard Paso 1 (Fecha) y transición a Paso 2 (Hora)\n  * Estados en SESSIONS\n  * Log básico en LOGS\n\nSiguientes pasos para completar (mismo patrón):\n- AGENDA_PASO_HORA -> AGENDA_PASO_NOMBRE -> AGENDA_PASO_MOTIVO -> AGENDA_PASO_CANAL -> AGENDA_CONFIRMACION\n- Validar doble reserva consultando CITAS por fecha+hora\n- Append Row en CITAS con id_cita = CITA-{{$now.toFormat('yyyyLLddHHmmss')}}\n",
+        "height": 310,
+        "width": 520
+      },
+      "id": "51d4a3b2-7f22-4f2b-9c1c-61b0d5c2b0e2",
+      "name": "NOTA - Config",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -980,
+        -80
+      ]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Entrada": {
+      "main": [
+        [
+          {
+            "node": "Verificación Usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificación Usuario": {
+      "main": [
+        [
+          {
+            "node": "IF Usuario Permitido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Usuario Permitido": {
+      "main": [
+        [
+          {
+            "node": "Buscar Sesión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram - Denegado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Sesión": {
+      "main": [
+        [
+          {
+            "node": "IF Existe Sesión",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Existe Sesión": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Sesión (Existente)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear Sesión Inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Sesión Inicial": {
+      "main": [
+        [
+          {
+            "node": "Releer Sesión (tras crear)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Releer Sesión (tras crear)": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Sesión (Releída)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Sesión (Existente)": {
+      "main": [
+        [
+          {
+            "node": "Router por Pantalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Sesión (Releída)": {
+      "main": [
+        [
+          {
+            "node": "Router por Pantalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router por Pantalla": {
+      "main": [
+        [
+          {
+            "node": "MP: IF Opción Válida",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agenda: IF Opción Válida",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fecha: IF Cancelar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "node": "MP: Mostrar Menú",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MP: IF Opción Válida": {
+      "main": [
+        [
+          {
+            "node": "MP: Switch Opción",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MP: Opción inválida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MP: Switch Opción": {
+      "main": [
+        [
+          {
+            "node": "MP: Enviar Ayuda",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MP-> Agenda: Actualizar Sesión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MP: No implementado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MP-> Agenda: Actualizar Sesión": {
+      "main": [
+        [
+          {
+            "node": "Agenda: Mostrar Menú",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+
+    "Agenda: IF Opción Válida": {
+      "main": [
+        [
+          {
+            "node": "Agenda: Switch Opción",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agenda: Opción inválida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agenda: Switch Opción": {
+      "main": [
+        [
+          {
+            "node": "Agenda-> Paso Fecha: Actualizar Sesión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agenda: Consultar (demo)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agenda-> MP: Actualizar Sesión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agenda: Consultar (demo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agenda-> Paso Fecha: Actualizar Sesión": {
+      "main": [
+        [
+          {
+            "node": "Agenda Wizard: Preguntar Fecha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agenda-> MP: Actualizar Sesión": {
+      "main": [
+        [
+          {
+            "node": "MP: Mostrar Menú",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+
+    "Fecha: IF Cancelar": {
+      "main": [
+        [
+          {
+            "node": "Cancelar-> Volver a Agenda (Sesión)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fecha: IF Formato OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancelar-> Volver a Agenda (Sesión)": {
+      "main": [
+        [
+          {
+            "node": "Cancelar-> Mostrar Menú Agenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha: IF Formato OK": {
+      "main": [
+        [
+          {
+            "node": "Fecha: IF No Pasado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fecha: Formato inválido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha: IF No Pasado": {
+      "main": [
+        [
+          {
+            "node": "Fecha OK -> Guardar y pedir Hora (Sesión)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fecha: Está en el pasado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha OK -> Guardar y pedir Hora (Sesión)": {
+      "main": [
+        [
+          {
+            "node": "Agenda Wizard: Preguntar Hora",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+
+    "MP: Enviar Ayuda": {
+      "main": [
+        [
+          {
+            "node": "LOG (simple)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agenda: Mostrar Menú": {
+      "main": [
+        [
+          {
+            "node": "LOG (simple)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "America/Bogota",
+    "executionOrder": "v1"
+  },
+  "versionId": "b9f1a0b6-b2cf-4c1c-8e54-1f2d1b2f7f2a",
+  "meta": {
+    "instanceId": "agendabot-services-local"
+  },
+  "tags": [
+    {
+      "name": "AgendaBot"
+    }
+  ]
+}
