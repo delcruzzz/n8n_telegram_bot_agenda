@@ -51,31 +51,6 @@ Google Sheets (AgendaBot_DB)
 * Telegram Bot API
 * n8n Community Edition (self-hosted / Docker)
 * Google Sheets
-* JavaScript (Function nodes en n8n)
-
----
-
-## 📂 Estructura del Repositorio
-
-```
-/
-├── n8n/
-│   ├── workflows/
-│   │   ├── agenda.json
-│   │   ├── tareas.json
-│   │   ├── habitos.json
-│   │   └── router_principal.json
-│
-├── google-sheets/
-│   └── AgendaBot_DB_structure.md
-│
-├── docs/
-│   ├── flujos-agenda.md
-│   ├── flujos-tareas.md
-│   └── flujos-habitos.md
-│
-└── README.md
-```
 
 ---
 
