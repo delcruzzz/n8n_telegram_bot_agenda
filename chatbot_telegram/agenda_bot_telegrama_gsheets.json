@@ -9150,6 +9150,28 @@
                 ],
                 "combinator": "and"
               }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "869e4f78-c634-4c16-bce9-918698058425",
+                    "leftValue": "={{ $json.pantalla_actual }}",
+                    "rightValue": "wz_reporte_fin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
             }
           ]
         },
@@ -16243,6 +16265,31 @@
               },
               "renameOutput": true,
               "outputKey": "productividad_general"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0f7a8764-9b04-4450-8bdf-069f4aec5fc1",
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "9",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "menu_principal"
             }
           ]
         },
@@ -16270,7 +16317,7 @@
         -720
       ],
       "id": "328d0fe7-790a-4e7e-b9fb-459d9361e623",
-      "name": "Send a text message",
+      "name": "enviar mensaje desde menu_reportes de productividad",
       "webhookId": "4af7bc33-2b17-456c-b793-f1ddfc949504",
       "credentials": {
         "telegramApi": {
@@ -16300,10 +16347,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1200,
-        -864
+        1120,
+        -720
       ],
-      "id": "6f2c9c0c-b781-4210-b7b4-cf99db05cd0a",
+      "id": "3a8b4362-4a02-41a7-8996-3eb41fe28fbe",
       "name": "obtener todas las citas",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -16311,6 +16358,131 @@
           "name": "Google Sheets account"
         }
       }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a7dd3321-1780-49a5-963f-d6cb85619187",
+              "name": "id_cita",
+              "value": "={{ $json.id_cita }}",
+              "type": "string"
+            },
+            {
+              "id": "55416df4-092e-4011-9a2d-8ee41173e6be",
+              "name": "fecha",
+              "value": "={{ $json.fecha }}",
+              "type": "string"
+            },
+            {
+              "id": "6e71ef02-444e-42de-822d-17b616b398b3",
+              "name": "hora",
+              "value": "={{ $json.hora }}",
+              "type": "string"
+            },
+            {
+              "id": "10363f94-1dfb-42ba-8912-8a24f68faaa4",
+              "name": "nombre",
+              "value": "={{ $json.nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "e12c7fc2-8acc-4810-8c56-24cdaeca3d34",
+              "name": "motivo",
+              "value": "={{ $json.motivo }}",
+              "type": "string"
+            },
+            {
+              "id": "0deb2a57-2137-4311-acce-53b07422d801",
+              "name": "canal",
+              "value": "={{ $json.canal }}",
+              "type": "string"
+            },
+            {
+              "id": "263429ae-998a-424b-93f1-132507853325",
+              "name": "estado",
+              "value": "={{ $json.estado }}",
+              "type": "string"
+            },
+            {
+              "id": "e37ec0b2-19b7-4520-b497-723e04e091d6",
+              "name": "creado_por",
+              "value": "={{ $json.creado_por }}",
+              "type": "number"
+            },
+            {
+              "id": "7bd74863-8978-41a5-81ca-26661855edd6",
+              "name": "tipo",
+              "value": "cita",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        -720
+      ],
+      "id": "b0464f5c-50fd-4e61-88f3-7c9815b7175a",
+      "name": "normalizar citas"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3644460c-25cb-48d1-8cbe-9d4adf6b54fd",
+              "leftValue": "={{ $json.id_cita }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "42819bd8-f014-43b2-a4bd-ea25467002c3",
+              "leftValue": "={{ $json.creado_por }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "e987c0d3-00c7-42e1-ad18-28a9e94ee625",
+              "leftValue": "={{ $json.estado }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1616,
+        -720
+      ],
+      "id": "fc8584f3-8603-4e33-b59b-2f2d7719f920",
+      "name": "¿las citas tienen los datos completos?"
     },
     {
       "parameters": {
@@ -16323,20 +16495,20 @@
         },
         "sheetName": {
           "__rl": true,
-          "value": "gid=0",
+          "value": 700355058,
           "mode": "list",
-          "cachedResultName": "CITAS",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit#gid=0"
+          "cachedResultName": "TAREAS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit#gid=700355058"
         },
         "options": {}
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1200,
-        -640
+        1120,
+        -464
       ],
-      "id": "818aec01-e494-460f-aba2-b2da68f0836c",
+      "id": "6dfe31f6-3e5f-4a75-8e3c-4be7b7f5dbc0",
       "name": "obtener todas las tareas",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -16347,16 +16519,904 @@
     },
     {
       "parameters": {
-        "jsCode": "const result = {};\n\nfor (const item of items) {\n  const creadoPor = item.json.creado_por;\n  const estado = item.json.estado;\n\n  const esCita = item.json.id_cita != null;\n  const esTarea = item.json.id_tarea != null;\n\n  if (!result[creadoPor]) {\n    result[creadoPor] = {\n      creado_por: creadoPor,\n\n      citas: {\n        total: 0,\n        completadas_total: 0,\n        canceladas_total: 0,\n        completadas: [],\n        canceladas: []\n      },\n\n      tareas: {\n        total: 0,\n        finalizadas_total: 0,\n        pendientes_total: 0,\n        finalizadas: [],\n        pendientes: []\n      }\n    };\n  }\n\n  // ===== CITAS =====\n  if (esCita) {\n    result[creadoPor].citas.total += 1;\n\n    const citaBase = {\n      id_cita: item.json.id_cita,\n      fecha: item.json.fecha,\n      hora: item.json.hora\n    };\n\n    if (estado === \"completada\") {\n      result[creadoPor].citas.completadas_total += 1;\n      result[creadoPor].citas.completadas.push(citaBase);\n    } else if (estado === \"cancelada\") {\n      result[creadoPor].citas.canceladas_total += 1;\n      result[creadoPor].citas.canceladas.push(citaBase);\n    }\n  }\n\n  // ===== TAREAS =====\n  if (esTarea) {\n    result[creadoPor].tareas.total += 1;\n\n    const tareaBase = {\n      id_tarea: item.json.id_tarea,\n      titulo: item.json.titulo,\n      prioridad: item.json.prioridad\n    };\n\n    if (estado === \"finalizada\") {\n      result[creadoPor].tareas.finalizadas_total += 1;\n      result[creadoPor].tareas.finalizadas.push(tareaBase);\n    } else if (estado === \"pendiente\") {\n      result[creadoPor].tareas.pendientes_total += 1;\n      result[creadoPor].tareas.pendientes.push(tareaBase);\n    }\n  }\n}\n\nreturn Object.values(result).map(r => ({ json: r }));\n"
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e620cd27-58c1-4e6e-96c6-9f70aad29fea",
+              "name": "id_tarea",
+              "value": "={{ $json.id_tarea }}",
+              "type": "string"
+            },
+            {
+              "id": "1151099a-eb35-4b5f-904b-ff6396dc464d",
+              "name": "titulo",
+              "value": "={{ $json.titulo }}",
+              "type": "string"
+            },
+            {
+              "id": "dad6eeb4-0405-4c8d-9755-307bef7a3246",
+              "name": "prioridad",
+              "value": "={{ $json.prioridad }}",
+              "type": "string"
+            },
+            {
+              "id": "3fc3b66f-8408-4335-8fdd-47e50016407e",
+              "name": "estado",
+              "value": "={{ $json.estado }}",
+              "type": "string"
+            },
+            {
+              "id": "37684b1b-18b1-4421-a7cd-ccc98b479f3c",
+              "name": "fecha_objetivo",
+              "value": "={{ $json.fecha_objetivo }}",
+              "type": "string"
+            },
+            {
+              "id": "83ab0ddb-73ae-402a-bba3-c28690a026b6",
+              "name": "creado_por",
+              "value": "={{ $json.creado_por }}",
+              "type": "number"
+            },
+            {
+              "id": "3993217b-5900-4f93-807b-916e732e0d62",
+              "name": "tipo",
+              "value": "tarea",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        -464
+      ],
+      "id": "19862e6e-678e-4d59-a764-3b314ce62d40",
+      "name": "normalizar tareas"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "678af666-5439-418e-a8be-818be7046df9",
+              "leftValue": "={{ $json.id_tarea }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c5935a4b-4fd8-46d2-b77d-ef3ed7378357",
+              "leftValue": "={{ $json.estado }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3afc4229-a398-4e44-acab-972b25106eeb",
+              "leftValue": "={{ $json.creado_por }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1616,
+        -464
+      ],
+      "id": "cf864e9d-2b49-4e1c-8872-6f0626e755a6",
+      "name": "¿las tareas tienen los datos completos?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2144,
+        -592
+      ],
+      "id": "84372108-2c81-49dc-9930-c93b8773ada3",
+      "name": "combinar datos entre tareas y citas"
+    },
+    {
+      "parameters": {
+        "jsCode": "let citas = 0;\nlet tareas = 0;\n\nfor (const i of items) {\n  if (i.json.tipo === \"cita\") citas++;\n  if (i.json.tipo === \"tarea\") tareas++;\n}\n\nreturn [{ json: { total: items.length, citas, tareas } }];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1664,
-        -720
+        3344,
+        -592
       ],
-      "id": "714c1f27-ce1d-42b7-b77d-e420e70c641f",
-      "name": "Code in JavaScript"
+      "id": "37714ae5-c218-49ff-829c-56defc54be13",
+      "name": "validación de combinación"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U",
+          "mode": "list",
+          "cachedResultName": "AgendaBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 373334979,
+          "mode": "list",
+          "cachedResultName": "USUARIOS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit#gid=373334979"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2640,
+        -592
+      ],
+      "id": "5d9aa8ae-f087-494c-b0dc-fa3c66acf2d6",
+      "name": "obtener todos los usuarios",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "156e2670-92bb-49ec-b878-9a4a59c20687",
+              "name": "telegram_user",
+              "value": "={{ $json.telegram_user }}",
+              "type": "number"
+            },
+            {
+              "id": "716a2833-0774-436d-a68a-304b6dc32f36",
+              "name": "nombre",
+              "value": "={{ $json.nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "348fde79-43c0-487a-a6d7-07fa27b377f7",
+              "name": "rol",
+              "value": "={{ $json.rol }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2864,
+        -592
+      ],
+      "id": "ee536ede-8193-4bea-9bc2-436e3c66ce3e",
+      "name": "normalizar usuarios"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "ct",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        -592
+      ],
+      "id": "a0acbbea-2c1e-457f-af26-9aae8f888da5",
+      "name": "agregación combiación de citas y tareas"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3072,
+        -592
+      ],
+      "id": "48a66029-c2f1-4a7c-a6c9-8b0b91f3b96b",
+      "name": "agregación de usuarios"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3488,
+        -176
+      ],
+      "id": "1d567e15-7a3f-424c-ac2c-d04537d2f572",
+      "name": "combinación de citas, tareas y usuarios"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0].json;\n\nconst ct = Array.isArray(payload.ct) ? payload.ct : [];\nconst users = Array.isArray(payload.users) ? payload.users : [];\n\nconst normUser = (u) => String(u ?? '').trim();\nconst normEstado = (s) => String(s ?? '').trim().toLowerCase();\n\n// 1) Base de usuarios con ceros\nconst byUser = {};\nfor (const u of users) {\n  const tu = normUser(u.telegram_user ?? u.creado_por ?? u.user ?? u.username);\n  if (!tu) continue;\n  if (!byUser[tu]) {\n    byUser[tu] = {\n      telegram_user: tu,\n      total_citas: 0,\n      citas_completadas: 0,\n      citas_canceladas: 0,\n      total_tareas: 0,\n      tareas_completadas: 0,\n      tareas_pendientes: 0,\n      interacciones: 0,\n    };\n  }\n}\n\n// 2) Reglas para ignorar registros incompletos\n// Cita válida: id_cita, creado_por/telegram_user, estado (y opcional fecha/hora)\n// Tarea válida: id_tarea, creado_por/telegram_user, estado (y opcional titulo)\nconst isValidCita = (x) => x?.id_cita && (x?.creado_por || x?.telegram_user) && x?.estado;\nconst isValidTarea = (x) => x?.id_tarea && (x?.creado_por || x?.telegram_user) && x?.estado;\n\n// 3) Contadores globales\nlet total_citas_registradas = 0;\nlet total_tareas_registradas = 0;\n\n// 4) Recorrer actividad (ct)\nfor (const x of ct) {\n  const tu = normUser(x.telegram_user ?? x.creado_por);\n  if (!tu) continue;\n\n  // si el usuario no existe en la hoja USUARIOS, igual debe aparecer:\n  if (!byUser[tu]) {\n    byUser[tu] = {\n      telegram_user: tu,\n      total_citas: 0,\n      citas_completadas: 0,\n      citas_canceladas: 0,\n      total_tareas: 0,\n      tareas_completadas: 0,\n      tareas_pendientes: 0,\n      interacciones: 0,\n    };\n  }\n\n  const estado = normEstado(x.estado);\n\n  if (isValidCita(x)) {\n    byUser[tu].total_citas += 1;\n    total_citas_registradas += 1;\n\n    if (estado === 'completada' || estado === 'completado') byUser[tu].citas_completadas += 1;\n    if (estado === 'cancelada' || estado === 'cancelado') byUser[tu].citas_canceladas += 1;\n\n    byUser[tu].interacciones += 1;\n    continue;\n  }\n\n  if (isValidTarea(x)) {\n    byUser[tu].total_tareas += 1;\n    total_tareas_registradas += 1;\n\n    if (estado === 'finalizada' || estado === 'hecha' || estado === 'completada') {\n      byUser[tu].tareas_completadas += 1;\n    } else if (estado === 'pendiente') {\n      byUser[tu].tareas_pendientes += 1;\n    }\n\n    byUser[tu].interacciones += 1;\n    continue;\n  }\n\n  // si no cumple validación, se ignora (registros incompletos)\n}\n\n// 5) Lista ordenada\nconst usersList = Object.values(byUser)\n  .sort((a, b) => a.telegram_user.localeCompare(b.telegram_user));\n\n// 6) Usuario más activo\nlet usuarioMasActivo = null;\nfor (const u of usersList) {\n  if (!usuarioMasActivo || u.interacciones > usuarioMasActivo.interacciones) {\n    usuarioMasActivo = u;\n  }\n}\n\nconst resumen = {\n  usuario_mas_activo: usuarioMasActivo?.telegram_user ?? 'N/A',\n  total_citas_registradas,\n  total_tareas_registradas,\n  // logs no necesarios: interacciones = actividad registrada (citas+tareas)\n  total_interacciones_bot: usersList.reduce((acc, u) => acc + (u.interacciones || 0), 0),\n};\n\nreturn [{\n  json: {\n    resumen,\n    detalle: usersList,\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3744,
+        -176
+      ],
+      "id": "feaf43c2-1fa9-4f22-afe8-a5194addcc2e",
+      "name": "calcular métricas generales"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { resumen, detalle } = items[0].json;\n\nconst title = `📊 Reporte de productividad (AgendaBot)\\n`;\nconst resumenTxt =\n`🧾 Resumen general\n- Usuario más activo: ${resumen.usuario_mas_activo}\n- Total citas registradas: ${resumen.total_citas_registradas}\n- Total tareas registradas: ${resumen.total_tareas_registradas}\n- Total interacciones con el bot: ${resumen.total_interacciones_bot}\n`;\n\nlet body = `\\n👥 Detalle por usuario\\n`;\ndetalle.forEach((u, idx) => {\n  body +=\n`${idx + 1}) ${u.telegram_user}\n   - Citas: ${u.total_citas} (Completadas: ${u.citas_completadas} | Canceladas: ${u.citas_canceladas})\n   - Tareas: ${u.total_tareas} (Hechas: ${u.tareas_completadas} | Pendientes: ${u.tareas_pendientes})\n   - Interacciones: ${u.interacciones}\n`;\n});\n\nconst footer =\n`\\n¿Qué deseas hacer ahora?\n1. Volver al menú Reportes\n2. Volver al menú principal\n`;\n\nreturn [{\n  json: {\n    report_text: `${title}\\n${resumenTxt}\\n${body}${footer}`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3984,
+        -176
+      ],
+      "id": "dc05dc47-bbe6-495e-9c98-941de0eb5b71",
+      "name": "métrica y mensaje final"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('normalización de datos').item.json.telegram_user }}",
+        "text": "={{ $json.report_text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4192,
+        -176
+      ],
+      "id": "da7476e4-cf33-43b7-8668-ed3270f9cf74",
+      "name": "Send a text message",
+      "webhookId": "8819631e-c63b-494e-b946-8f1f6452445e",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U",
+          "mode": "list",
+          "cachedResultName": "AgendaBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2120636757,
+          "mode": "list",
+          "cachedResultName": "SESSIONS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit#gid=2120636757"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user": "={{ $('normalización de datos').item.json.telegram_user }}",
+            "pantalla_actual": "wz_reporte_fin",
+            "paso_actual": "0",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "telegram_user"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user",
+              "displayName": "telegram_user",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pantalla_actual",
+              "displayName": "pantalla_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso_actual",
+              "displayName": "paso_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datos_parciales",
+              "displayName": "datos_parciales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp_ultima_interaccion",
+              "displayName": "timestamp_ultima_interaccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4432,
+        -176
+      ],
+      "id": "d4e6c05b-3d36-4c1b-9a01-a03e4e49a46a",
+      "name": "actualizar sesión a finalización de reporte",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "43873702-3cb2-46ee-9cfa-d7f2088b70af",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "a5070fbb-02fd-4a57-8efd-f5c18386191a",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2016,
+        -3728
+      ],
+      "id": "e4cb42ec-940e-4a18-bccb-09d1b7aec167",
+      "name": "¿opción invalida en menu_fin_reporte?"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1a3470b0-6252-4a24-862b-d47a8ec99e6a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6219604e-8c9e-4548-99af-a7feeea973ee",
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2544,
+        -3824
+      ],
+      "id": "3f0aaa74-eab9-4d73-ae73-71151c7568a4",
+      "name": "opciones en menú reporte final"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U",
+          "mode": "list",
+          "cachedResultName": "AgendaBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2120636757,
+          "mode": "list",
+          "cachedResultName": "SESSIONS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit#gid=2120636757"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user": "={{ $('normalización de datos').item.json.telegram_user }}",
+            "pantalla_actual": "menu_reportes",
+            "paso_actual": "0",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "telegram_user"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user",
+              "displayName": "telegram_user",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pantalla_actual",
+              "displayName": "pantalla_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso_actual",
+              "displayName": "paso_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datos_parciales",
+              "displayName": "datos_parciales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp_ultima_interaccion",
+              "displayName": "timestamp_ultima_interaccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3072,
+        -3872
+      ],
+      "id": "406f5137-c236-4aba-9777-45bca184d8ed",
+      "name": "actualizar sesión a menu_reportes desde menú final de reportes",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U",
+          "mode": "list",
+          "cachedResultName": "AgendaBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2120636757,
+          "mode": "list",
+          "cachedResultName": "SESSIONS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit#gid=2120636757"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user": "={{ $('normalización de datos').item.json.telegram_user }}",
+            "pantalla_actual": "menu_principal",
+            "paso_actual": "0",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "telegram_user"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user",
+              "displayName": "telegram_user",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pantalla_actual",
+              "displayName": "pantalla_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso_actual",
+              "displayName": "paso_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datos_parciales",
+              "displayName": "datos_parciales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp_ultima_interaccion",
+              "displayName": "timestamp_ultima_interaccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2992,
+        -3632
+      ],
+      "id": "873af30b-8db3-401b-8b4a-28eba7d7bf90",
+      "name": "actualizar sesión a menu_principal desde menú final de reportes",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('normalización de datos').item.json.telegram_user }}",
+        "text": "=Reportes\n\n1. Reporte diario\n2. Reporte semanal\n3. Productividad (tareas)\n4. Hábitos (cumplimiento)\n5. Agenda (estado de citas)\n6. Productividad por usuario (reporte completo)\n9. Volver al menú principal",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3472,
+        -3856
+      ],
+      "id": "18b9882a-1e06-4b9e-ac52-2b8a8592700c",
+      "name": "enviar mensaje de reportes desde opción menú final reportes",
+      "webhookId": "f4e94c8a-6bec-4eb1-bb3f-fbbaaf07a67c",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('normalización de datos').item.json.telegram_user }}",
+        "text": "=¿En qué te puedo ayudar hoy?\n\nMenú principal:\n0. Ayuda\n1. Agenda (citas)\n2. Tareas\n3. Recordatorios\n4. Hábitos\n5. Listas\n6. Reportes\n7. Configuración\n8. Administrador",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3312,
+        -3616
+      ],
+      "id": "ff972e80-09b7-48ae-b1a0-3a1263e3345b",
+      "name": "enviar mensaje de menú principal desde opción menú final reportes",
+      "webhookId": "f4e94c8a-6bec-4eb1-bb3f-fbbaaf07a67c",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U",
+          "mode": "list",
+          "cachedResultName": "AgendaBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2120636757,
+          "mode": "list",
+          "cachedResultName": "SESSIONS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11XQrS-DPM1LNCjGrkujGMu5Vjj27Mq3_Eq58rdRNp4U/edit#gid=2120636757"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_user": "={{ $('normalización de datos').item.json.telegram_user }}",
+            "pantalla_actual": "menu_principal",
+            "paso_actual": "0",
+            "datos_parciales": "{}",
+            "timestamp_ultima_interaccion": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "telegram_user"
+          ],
+          "schema": [
+            {
+              "id": "telegram_user",
+              "displayName": "telegram_user",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pantalla_actual",
+              "displayName": "pantalla_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso_actual",
+              "displayName": "paso_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datos_parciales",
+              "displayName": "datos_parciales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp_ultima_interaccion",
+              "displayName": "timestamp_ultima_interaccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        -192
+      ],
+      "id": "360c0be5-0331-4b11-acec-41b3d4bba51c",
+      "name": "actualizar sesión a menú principal",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QoTNXAVjw4z9et9a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('normalización de datos').item.json.telegram_user }}",
+        "text": "=¿En qué te puedo ayudar hoy?\n\nMenú principal:\n0. Ayuda\n1. Agenda (citas)\n2. Tareas\n3. Recordatorios\n4. Hábitos\n5. Listas\n6. Reportes\n7. Configuración\n8. Administrador",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        -192
+      ],
+      "id": "5613675f-ca03-4c5c-bcdf-c49202ad1a0d",
+      "name": "enviar mensaje de menú principal en opción menu_principal",
+      "webhookId": "0624f744-b996-42f3-83cf-fbc225188e34",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ed1Qbsh1dnrbIQev",
+          "name": "AgendaBot Campus"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -17855,6 +18915,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "¿opción invalida en menu_fin_reporte?",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -19050,6 +20117,193 @@
         [],
         [
           {
+            "node": "enviar mensaje desde menu_reportes de productividad",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "actualizar sesión a menú principal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviar mensaje desde menu_reportes de productividad": {
+      "main": [
+        [
+          {
+            "node": "obtener todas las citas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "obtener todas las tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener todas las citas": {
+      "main": [
+        [
+          {
+            "node": "normalizar citas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalizar citas": {
+      "main": [
+        [
+          {
+            "node": "¿las citas tienen los datos completos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿las citas tienen los datos completos?": {
+      "main": [
+        [
+          {
+            "node": "combinar datos entre tareas y citas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener todas las tareas": {
+      "main": [
+        [
+          {
+            "node": "normalizar tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalizar tareas": {
+      "main": [
+        [
+          {
+            "node": "¿las tareas tienen los datos completos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿las tareas tienen los datos completos?": {
+      "main": [
+        [
+          {
+            "node": "combinar datos entre tareas y citas",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "combinar datos entre tareas y citas": {
+      "main": [
+        [
+          {
+            "node": "agregación combiación de citas y tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener todos los usuarios": {
+      "main": [
+        [
+          {
+            "node": "normalizar usuarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalizar usuarios": {
+      "main": [
+        [
+          {
+            "node": "agregación de usuarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agregación combiación de citas y tareas": {
+      "main": [
+        [
+          {
+            "node": "obtener todos los usuarios",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "combinación de citas, tareas y usuarios",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "agregación de usuarios": {
+      "main": [
+        [
+          {
+            "node": "validación de combinación",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "combinación de citas, tareas y usuarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "combinación de citas, tareas y usuarios": {
+      "main": [
+        [
+          {
+            "node": "calcular métricas generales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calcular métricas generales": {
+      "main": [
+        [
+          {
+            "node": "métrica y mensaje final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "métrica y mensaje final": {
+      "main": [
+        [
+          {
             "node": "Send a text message",
             "type": "main",
             "index": 0
@@ -19061,29 +20315,69 @@
       "main": [
         [
           {
-            "node": "obtener todas las citas",
+            "node": "actualizar sesión a finalización de reporte",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "obtener todas las citas": {
+    "¿opción invalida en menu_fin_reporte?": {
       "main": [
         [
           {
-            "node": "obtener todas las tareas",
+            "node": "opciones en menú reporte final",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "obtener todas las tareas": {
+    "opciones en menú reporte final": {
       "main": [
         [
           {
-            "node": "Code in JavaScript",
+            "node": "actualizar sesión a menu_reportes desde menú final de reportes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "actualizar sesión a menu_principal desde menú final de reportes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "actualizar sesión a menu_reportes desde menú final de reportes": {
+      "main": [
+        [
+          {
+            "node": "enviar mensaje de reportes desde opción menú final reportes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "actualizar sesión a menu_principal desde menú final de reportes": {
+      "main": [
+        [
+          {
+            "node": "enviar mensaje de menú principal desde opción menú final reportes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "actualizar sesión a menú principal": {
+      "main": [
+        [
+          {
+            "node": "enviar mensaje de menú principal en opción menu_principal",
             "type": "main",
             "index": 0
           }
@@ -19091,12 +20385,12 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "f99046da-4128-4036-887a-c765f1343307",
+  "versionId": "97f71b2c-c32a-41e5-afbc-4236d6848a67",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "a2243de902ea74b5b663537c3e3742969b5833ba80f205b39d5bc0bf3e21b209"
